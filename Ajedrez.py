@@ -124,9 +124,8 @@ def render_board(board):
     board_svg = chess.svg.board(board=board, size=400)
     b64 = base64.b64encode(board_svg.encode('utf-8')).decode('utf-8')
     return f'<div style="display: flex; justify-content: center;"><img src="data:image/svg+xml;base64,{b64}"/></div>'
-
-# Mostrar tablero actual
-st.markdown(render_board(st.session_state.board), unsafe_allowed_keys=True, unsafe_allowed_html=True)
+# LÍNEA CORREGIDA:
+st.markdown(render_board(st.session_state.board), unsafe_allow_html=True)
 
 # Controles y lógica de cálculo
 st.write("---")
