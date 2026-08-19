@@ -1,6 +1,7 @@
 import streamlit as st
 import chess
-from streamlit_chess import st_chess
+# CAMBIO AQUÍ: Usamos la librería correcta 'stchess'
+from stchess import board as st_chess
 
 st.set_page_config(page_title="IA Ajedrez Personalizado", layout="centered")
 st.title("♟️ Analizador de Ajedrez con Tu Color")
