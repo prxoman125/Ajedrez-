@@ -1,7 +1,7 @@
 import streamlit as st
 import chess
 # CAMBIO AQUÍ: Usamos la librería correcta 'stchess'
-from stchess import board as st_chess
+from stchess import board as st_chess 
 
 st.set_page_config(page_title="IA Ajedrez Personalizado", layout="centered")
 st.title("♟️ Analizador de Ajedrez con Tu Color")
@@ -99,27 +99,24 @@ def minimax(b, depth, alpha, beta, maximizing_player):
 # --- INTERFAZ VISUAL DEL TABLERO ---
 st.write(f"**Turno actual del juego:** {'Blancas' if board.turn == chess.WHITE else 'Negras'}")
 
-# Renderizar tablero interactivo que permite arrastrar piezas
-# 'orientation' voltea el tablero para comodidad del usuario
-board_orientation = "white" if user_is_white else "black"
-chess_move = st_chess(fen=st.session_state.board_fen, orientation=board_orientation, key="chess_board")
+# CAMBIO AQUÍ: Adaptado al componente nativo de stchess
+# Recibe el FEN inicial y devuelve el nuevo FEN cuando arrastras una pieza
+new_fen = st_chess(fen=st.session_state.board_fen, key="chess_board")
 
 # Detectar si el usuario movió una pieza en la pantalla
-if chess_move and chess_move.get("fen") and chess_move["fen"] != st.session_state.board_fen:
-    st.session_state.board_fen = chess_move["fen"]
+if new_fen and new_fen != st.session_state.board_fen:
+    st.session_state.board_fen = new_fen
     st.rerun()
 
 # --- LÓGICA DE ANÁLISIS ---
 st.write("---")
 
-# Comprobar si es el turno del bando del usuario
 is_user_turn = (board.turn == chess.WHITE and user_is_white) or (board.turn == chess.BLACK and not user_is_white)
 
 if is_user_turn:
     st.info("💡 **Es tu turno.** Presiona el botón para que la fórmula matemática calcule tu mejor opción estratégica.")
     if st.button("🧮 Calcular mi mejor jugada", use_container_width=True):
         with st.spinner("Resolviendo ecuaciones de posición..."):
-            # Profundidad 3 para balancear velocidad y precisión
             score, best_move = minimax(board, depth=3, alpha=-float('inf'), beta=float('inf'), maximizing_player=user_is_white)
         
         if best_move:
@@ -134,12 +131,10 @@ if is_user_turn:
             st.markdown(f"* **Hacia la casilla:** `{to_sq.upper()}`")
             st.caption(f"Valor matemático neto de la posición: {score / 100.0} puntos.")
             
-            # Guardamos la sugerencia para poder ejecutarla automáticamente si el usuario quiere
             st.session_state.ai_suggested_move = best_move
 else:
     st.warning("⏳ **Turno del Rival.** Mueve directamente las piezas del oponente en el tablero de arriba para simular su jugada.")
 
-# Botón opcional para aplicar la jugada de la IA directamente
 if "ai_suggested_move" in st.session_state and is_user_turn:
     if st.button("🤖 Aplicar movimiento sugerido por la IA", type="primary", use_container_width=True):
         board.push(st.session_state.ai_suggested_move)
@@ -147,7 +142,6 @@ if "ai_suggested_move" in st.session_state and is_user_turn:
         del st.session_state.ai_suggested_move
         st.rerun()
 
-# Botón para resetear la partida
 if st.button("♻️ Reiniciar Partida", type="secondary"):
     st.session_state.board_fen = chess.STARTING_FEN
     if "ai_suggested_move" in st.session_state:
