@@ -1,2 +1,4 @@
-streamlit 
-chess 
+streamlit
+python-chess
+stchess
+ 
